@@ -1,17 +1,10 @@
-from flask import Flask, request, Response, jsonify
-from flask_sqlalchemy import SQLAlchemy
+import datetime
+from flask import Flask, request, Response, jsonify, Blueprint
 import enum
 from sqlalchemy import DateTime, Enum
+from . import db, app
 
 from utils import CustomJsonEncoder
-
-app = Flask(__name__)
-# This DB address is because the database is running in a container
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://flask:Flask@0.0.0.0:3307/employees?charset=utf8mb4"
-app.json_encoder = CustomJsonEncoder
-
-db = SQLAlchemy(app)
-
 
 # Entities definition
 
@@ -27,7 +20,8 @@ class Employee(db.Model):
     first_name = db.Column("first_name", db.String)
     last_name = db.Column("last_name", db.String)
     gender = db.Column("gender", Enum(Gender), nullable=False)
-    hire_date = db.Column("hire_date", DateTime, nullable=False)
+    hire_date = db.Column("hire_date", DateTime, nullable=False,default=datetime.date.today())
+    birth_date = db.Column("birth_date",DateTime,nullable=False)
 
 
 # Employee Data Access Methods
@@ -97,17 +91,25 @@ def get_employees():
 def create_employee():
     employee_payload = request.get_json()
 
-    if not employee_payload:
+    try:
+
+        employee_data = employee_payload["employee"]
+
+        new_employee = Employee()
+        new_employee.first_name = employee_data["first_name"]
+        new_employee.last_name = employee_data["last_name"]
+        new_employee.gender = employee_data["gender"]
+        new_employee.birth_date = datetime.date.today()
+
+        save_employee(new_employee)
+
+        return jsonify(new_employee)
+
+    except KeyError:
         return Response("Invalid JSON content",status=400)
 
-    employee_data = employee_payload["employee"]
 
-    new_employee = Employee()
-    new_employee.first_name = employee_data["first_name"]
-    new_employee.last_name = employee_data["last_name"]
-    new_employee.gender = employee_data["gender"]
-
-    save_employee(new_employee)
-
-    return Response(new_employee,status=201)
+@app.route("/test")
+def blueprint_demo():
+    return Response("This is a demo")
 
