@@ -1,12 +1,13 @@
 import datetime
 from flask import Flask, request, Response, jsonify, Blueprint
 import enum
+
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import DateTime, Enum
-from . import db, app
+from learning_flask import create_app
 
-
-# Entities definition
-
+app = create_app(__name__)
+db = SQLAlchemy(app)
 
 class Gender(enum.Enum):
     M = "M"
@@ -29,7 +30,7 @@ class Employee(db.Model):
 # Declaring BluePrint for employees endpoints
 
 employee_blueprint = Blueprint("employee", __name__, url_prefix="/employee")
-
+app.register_blueprint(employee_blueprint)
 
 # Employee Data Access Methods
 def find_all_employees():
@@ -117,6 +118,6 @@ def create_employee():
         return Response("Invalid JSON content", status=400)
 
 
-@app.route("/test")
+@employee_blueprint.route("/test")
 def blueprint_demo():
     return Response("This is a demo")
