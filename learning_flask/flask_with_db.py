@@ -4,9 +4,9 @@ import enum
 from sqlalchemy import DateTime, Enum
 from . import db, app
 
-from utils import CustomJsonEncoder
 
 # Entities definition
+
 
 class Gender(enum.Enum):
     M = "M"
@@ -20,8 +20,15 @@ class Employee(db.Model):
     first_name = db.Column("first_name", db.String)
     last_name = db.Column("last_name", db.String)
     gender = db.Column("gender", Enum(Gender), nullable=False)
-    hire_date = db.Column("hire_date", DateTime, nullable=False,default=datetime.date.today())
-    birth_date = db.Column("birth_date",DateTime,nullable=False)
+    hire_date = db.Column(
+        "hire_date", DateTime, nullable=False, default=datetime.date.today()
+    )
+    birth_date = db.Column("birth_date", DateTime, nullable=False)
+
+
+# Declaring BluePrint for employees endpoints
+
+employee_blueprint = Blueprint("employee", __name__, url_prefix="/employee")
 
 
 # Employee Data Access Methods
@@ -65,6 +72,7 @@ def update_employee_lastname(employee_id, last_name):
 
 # Endpoint definition
 
+
 @app.route("/employee")
 def get_employee():
     employee_id = request.args.get("id")
@@ -106,10 +114,9 @@ def create_employee():
         return jsonify(new_employee)
 
     except KeyError:
-        return Response("Invalid JSON content",status=400)
+        return Response("Invalid JSON content", status=400)
 
 
 @app.route("/test")
 def blueprint_demo():
     return Response("This is a demo")
-
