@@ -18,7 +18,9 @@ if not response.ok:
 
 scrapper = bs4.BeautifulSoup(response.text, features="html.parser")
 
-link_elements = scrapper.select(".r > a")
+link_elements = scrapper.select(".r > a:nth-of-type(1)")
+
+print(f"Google Search: {len(link_elements)} result(s)")
 
 for element in link_elements:
     title_select = element.select("h3 .ellip")
@@ -26,4 +28,4 @@ for element in link_elements:
 
     link_url = element.get("href")
 
-    print(f"{title_value}\n{link_url}")
+    print(f"* {title_value}\n{link_url}")

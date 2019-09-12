@@ -21,6 +21,7 @@ def get_popular_dollar_rates():
 
     return dollar_purchase_rate,dollar_sell_rate
 
+
 def get_reservas_dollar_rates():
 
     banreservas_main_page = requests.get("https://www.banreservas.com/")
